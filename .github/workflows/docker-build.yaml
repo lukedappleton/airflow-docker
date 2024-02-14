@@ -39,6 +39,6 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             docker push docker.pkg.github.com/${{ github.repository_owner }}/${{ github.repository_name }}:${{ github.head_ref }};
-          elif [ "${{ github.event_name }}" == "push" ]; then
+          else
             docker push docker.pkg.github.com/${{ github.repository_owner }}/${{ github.repository_name }}:latest;
           fi
