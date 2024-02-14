@@ -33,4 +33,4 @@ jobs:
           else
             tag="latest";
           fi
-          docker build --platform linux/amd64,linux/arm64 -t "${{ github.repository }}:${tag}" --push
+          docker buildx build --platform linux/amd64,linux/arm64 -t "${{ github.repository }}:${tag}" --push .
