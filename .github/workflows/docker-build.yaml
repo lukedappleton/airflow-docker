@@ -38,7 +38,7 @@ jobs:
       - name: Push Docker image to GitHub Packages
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            docker push docker.pkg.github.com/${{ github.repository_owner }}/${{ github.repository_name }}:${{ github.head_ref }};
+            docker push docker.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ github.head_ref }};
           else
-            docker push docker.pkg.github.com/${{ github.repository_owner }}/${{ github.repository_name }}:latest;
+            docker push docker.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest;
           fi
