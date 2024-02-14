@@ -1,0 +1,45 @@
+name: Build and Publish Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'  # Listen for pull requests on any branch
+    types:
+      - [opened, synchronize, closed]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ github.repository }}:${{ github.event_name == 'pull_request' ? github.head_ref : 'latest' }} .
+       
+      - name: Log in to GitHub Packages
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Tag Docker image
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            docker tag ${{ github.repository }}:${{ github.head_ref }} docker.pkg.github.com/${{ github.repository_owner }}/${{ github.repository_name }}:${{ github.head_ref }};
+          elif [ "${{ github.event_name }}" == "push" ]; then
+            docker tag ${{ github.repository }}:latest docker.pkg.github.com/${{ github.repository_owner }}/${{ github.repository_name }}:latest;
+          fi
+
+      - name: Push Docker image to GitHub Packages
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            docker push docker.pkg.github.com/${{ github.repository_owner }}/${{ github.repository_name }}:${{ github.head_ref }};
+          elif [ "${{ github.event_name }}" == "push" ]; then
+            docker push docker.pkg.github.com/${{ github.repository_owner }}/${{ github.repository_name }}:latest;
+          fi
