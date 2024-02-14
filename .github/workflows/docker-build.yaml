@@ -8,7 +8,9 @@ on:
     branches:
       - '*'  # Listen for pull requests on any branch
     types:
-      - [opened, synchronize, closed]
+      - opened
+      - synchronize
+      - closed
 
 jobs:
   build-and-publish:
