@@ -1,0 +1,36 @@
+name: Build and Publish Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'  # Listen for pull requests on any branch
+    types:
+      - opened
+      - synchronize
+      - closed
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.REPO_TOKEN }}" | docker login -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            tag="${{ github.head_ref }}";
+          else
+            tag="latest";
+          fi
+          docker buildx build --platform linux/amd64 -t "${{ github.repository }}:${tag}" --push .
