@@ -23,7 +23,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Log in to GitHub Packages
+      - name: Log in to Docker Hub
         run: echo "${{ secrets.REPO_TOKEN }}" | docker login -u ${{ github.actor }} --password-stdin
 
       - name: Build Docker image
@@ -33,4 +33,4 @@ jobs:
           else
             tag="latest";
           fi
-          docker buildx build --platform linux/amd64,linux/arm64 -t "${{ github.repository }}:${tag}" --push .
+          docker buildx build --platform linux/amd64 -t "${{ github.repository }}:${tag}" --push .
